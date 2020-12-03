@@ -48,7 +48,7 @@ var (
 	// OracleFulfillmentFunctionID20190128withoutCast is the function selector for fulfilling Ethereum requests,
 	// as updated on 2019-01-28, removing the cast to uint256 for the requestId.
 	OracleFulfillmentFunctionID20190128withoutCast = utils.MustHash("fulfillOracleRequest(bytes32,uint256,address,bytes4,uint256,bytes32)").Hex()[:10]
-	OracleFulfillmentFunctionID2020 = utils.MustHash("fulfillOracleRequest2(bytes32,uint256,address,bytes4,uint256,bytes)").Hex()[:10]
+	OracleFulfillmentFunctionID2020                = utils.MustHash("fulfillOracleRequest2(bytes32,uint256,address,bytes4,uint256,bytes)").Hex()[:10]
 )
 
 type logRequestParser interface {
@@ -427,9 +427,9 @@ func (parseRunLog20190207withoutIndexes) parseJSON(log Log) (JSON, error) {
 	}
 
 	// 8 bytes worth of data versions is plenty.
-	b := bytes.NewBuffer(log.Data[expirationEnd+versionSize-8:expirationEnd+versionSize])
+	b := bytes.NewBuffer(log.Data[expirationEnd+versionSize-8 : expirationEnd+versionSize])
 	var dataVersion uint64
-	err = binary.Read(b,binary.BigEndian,&dataVersion)
+	err = binary.Read(b, binary.BigEndian, &dataVersion)
 	if err != nil {
 		return JSON{}, err
 	}

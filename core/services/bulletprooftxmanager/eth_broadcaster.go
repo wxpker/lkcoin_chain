@@ -210,11 +210,11 @@ func (eb *ethBroadcaster) processUnstartedEthTxs(fromAddress gethCommon.Address)
 			fmt.Println("err", err.Error())
 			return errors.Wrap(err, "processUnstartedEthTxs failed")
 		}
-		fmt.Println("save in progress", fromAddress.String())
+
 		if err := eb.saveInProgressTransaction(etx, &a); err != nil {
 			return errors.Wrap(err, "processUnstartedEthTxs failed")
 		}
-		fmt.Println("handle in progress tx", *etx, a)
+
 		if err := eb.handleInProgressEthTx(*etx, a, time.Now()); err != nil {
 			return errors.Wrap(err, "processUnstartedEthTxs failed")
 		}
@@ -262,11 +262,8 @@ func (eb *ethBroadcaster) handleInProgressEthTx(etx models.EthTx, attempt models
 
 	ctx, cancel := context.WithTimeout(context.Background(), maxEthNodeRequestTime)
 	defer cancel()
+
 	sendError := sendTransaction(ctx, eb.ethClient, attempt)
-	fmt.Println("sending transaction", attempt.Hash.String())
-	fmt.Println("sending transaction, err", sendError)
-
-
 	if sendError.Fatal() {
 		etx.Error = sendError.StrPtr()
 		// Attempt is thrown away in this case; we don't need it since it never got accepted by a node

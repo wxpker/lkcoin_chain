@@ -6,8 +6,9 @@ contract MultiWordConsumer is ChainlinkClient{
     bytes32 internal specId;
     bytes public currentPrice;
 
-    bytes32 public first;
-    bytes32 public second;
+    bytes32 public usd;
+    bytes32 public eur;
+    bytes32 public jpy;
 
     event RequestFulfilled(
         bytes32 indexed requestId,  // User-defined ID
@@ -16,13 +17,18 @@ contract MultiWordConsumer is ChainlinkClient{
 
     event RequestMultipleFulfilled(
         bytes32 indexed requestId,
-        bytes32 indexed first,
-        bytes32 indexed second
+        bytes32 indexed usd,
+        bytes32 indexed eur,
+        bytes32 jpy
     );
 
     constructor(address _link, address _oracle, bytes32 _specId) public {
         setChainlinkToken(_link);
         setChainlinkOracle(_oracle);
+        specId = _specId;
+    }
+
+    function setSpecID(bytes32 _specId) public {
         specId = _specId;
     }
 
@@ -32,24 +38,11 @@ contract MultiWordConsumer is ChainlinkClient{
 
     function requestEthereumPriceByCallback(string memory _currency, uint256 _payment, address _callback) public {
         Chainlink.Request memory req = buildChainlinkRequest(specId, _callback, this.fulfillBytes.selector);
-//        req.add("get", "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD,EUR,JPY");
-//        string[] memory path = new string[](1);
-//        path[0] = _currency;
-//        req.addStringArray("path", path);
         sendChainlinkRequest(req, _payment);
     }
 
-    event Test(
-        string msg
-    );
-
     function requestMultipleParameters(string memory _currency, uint256 _payment) public {
-        emit Test("hello world");
         Chainlink.Request memory req = buildChainlinkRequest(specId, address(this), this.fulfillMultipleParameters.selector);
-        //    req.add("get", "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD,EUR,JPY");
-        //    string[] memory path = new string[](1);
-        //    path[0] = _currency;
-        //    req.addStringArray("path", path);
         sendChainlinkRequest(req, _payment);
     }
 
@@ -73,13 +66,14 @@ contract MultiWordConsumer is ChainlinkClient{
         addChainlinkExternalRequest(_oracle, _requestId);
     }
 
-    function fulfillMultipleParameters(bytes32 _requestId, bytes32 _first, bytes32 _second)
+    function fulfillMultipleParameters(bytes32 _requestId, bytes32 _usd, bytes32 _eur, bytes32 _jpy)
     public
     recordChainlinkFulfillment(_requestId)
     {
-        emit RequestMultipleFulfilled(_requestId, _first, _second);
-        first = _first;
-        second = _second;
+        emit RequestMultipleFulfilled(_requestId, _usd, _eur, _jpy);
+        usd = _usd;
+        eur = _eur;
+        jpy = _jpy;
     }
 
     function fulfillBytes(bytes32 _requestId, bytes memory _price)

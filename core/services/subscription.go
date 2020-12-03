@@ -97,12 +97,6 @@ func NewInitiatorSubscription(
 	if err != nil {
 		return InitiatorSubscription{}, errors.Wrap(err, "NewInitiatorSubscription#FilterQueryFactory")
 	}
-	for _, a := range filter.Addresses {
-		fmt.Println("filtering", a.String())
-	}
-	for _, a := range filter.Topics{
-		fmt.Println("topic", a, utils.MustHash("OracleRequest(bytes32,address,bytes32,uint256,address,bytes4,uint256,uint256,bytes)"))
-	}
 
 	sub := InitiatorSubscription{
 		runManager: runManager,
@@ -123,7 +117,6 @@ func NewInitiatorSubscription(
 func (sub InitiatorSubscription) dispatchLog(log models.Log) {
 	logger.Debugw(fmt.Sprintf("Log for %v initiator for job %s", sub.Initiator.Type, sub.Initiator.JobSpecID.String()),
 		"txHash", log.TxHash.Hex(), "logIndex", log.Index, "blockNumber", log.BlockNumber, "job", sub.Initiator.JobSpecID.String())
-	fmt.Println("Log for initiator for job", sub.Initiator.Type, sub.Initiator.JobSpecID.String(), "txHash", log.TxHash.Hex(), "logIndex", log.Index, "blockNumber", log.BlockNumber, "job", sub.Initiator.JobSpecID.String())
 
 	base := models.InitiatorLogEvent{
 		Initiator: sub.Initiator,
@@ -134,7 +127,6 @@ func (sub InitiatorSubscription) dispatchLog(log models.Log) {
 
 func loggerLogListening(initr models.Initiator, blockNumber *big.Int) {
 	msg := fmt.Sprintf("Listening for %v from block %v", initr.Type, presenters.FriendlyBigInt(blockNumber))
-	fmt.Println("listening address", initr.Address, "block", presenters.FriendlyBigInt(blockNumber))
 	logger.Infow(msg, "address", utils.LogListeningAddress(initr.Address), "jobID", initr.JobSpecID.String())
 }
 

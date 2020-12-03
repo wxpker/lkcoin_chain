@@ -1,8 +1,6 @@
 package adapters
 
 import (
-	"encoding/hex"
-	"fmt"
 	"math/big"
 	"reflect"
 
@@ -118,7 +116,6 @@ func (e *EthTx) insertEthTx(input models.RunInput, store *strpkg.Store) models.R
 		// Need to include the request ID in the calldata as the first arg also
 		curr := input.Data().Get(models.ResultCollectionKey).Array()
 		updated := make([]interface{}, 0)
-		fmt.Println("data prefix", e.DataPrefix)
 		updated = append(updated, e.DataPrefix[:32])
 		for _, c := range curr {
 			updated = append(updated, c.Value())
@@ -146,8 +143,8 @@ func (e *EthTx) insertEthTx(input models.RunInput, store *strpkg.Store) models.R
 	}
 
 	if e.ABIEncoding != nil {
-		// ABI encoding includes the data prefix if set.
-		encodedPayload = append(e.FunctionSelector.Bytes(), txData...)
+		payloadOffset := utils.EVMWordUint64(utils.EVMWordByteLen * 6)
+		encodedPayload = append(append(append(e.FunctionSelector.Bytes(), e.DataPrefix...), payloadOffset...), utils.EVMEncodeBytes(txData)...)
 	} else {
 		encodedPayload = append(append(e.FunctionSelector.Bytes(), e.DataPrefix...), txData...)
 	}
