@@ -1086,6 +1086,7 @@ func TestIntegration_MultiwordV1(t *testing.T) {
 	// Job should complete successfully.
 	_ = cltest.WaitForJobRunToComplete(t, app.Store, jr)
 	jr2, err := app.Store.ORM.FindJobRun(jr.ID)
+	require.NoError(t, err)
 	assert.Equal(t, 9, len(jr2.TaskRuns))
 	// We expect 2 results collected, the bid and ask
 	assert.Equal(t, 2, len(jr2.TaskRuns[8].Result.Data.Get(models.ResultCollectionKey).Array()))
@@ -1145,6 +1146,7 @@ func TestIntegration_MultiwordV1_Sim(t *testing.T) {
 	defer cleanup()
 	user, _, _, consumerContract, operatorContract, b := setupMultiWordContracts(t)
 	app, cleanup := cltest.NewApplicationWithConfigAndKeyOnSimulatedBlockchain(t, config, b)
+	defer cleanup()
 	app.Config.Set("ETH_HEAD_TRACKER_MAX_BUFFER_SIZE", 100)
 	app.Config.Set("MIN_OUTGOING_CONFIRMATIONS", 1)
 
@@ -1195,7 +1197,7 @@ func TestIntegration_MultiwordV1_Sim(t *testing.T) {
 
 	user.GasPrice = big.NewInt(1)
 	user.GasLimit = 1000000
-	tx, err = consumerContract.RequestMultipleParameters(user, "", big.NewInt(1000))
+	_, err = consumerContract.RequestMultipleParameters(user, "", big.NewInt(1000))
 	require.NoError(t, err)
 	b.Commit()
 
@@ -1205,12 +1207,9 @@ func TestIntegration_MultiwordV1_Sim(t *testing.T) {
 	tick := time.NewTicker(100 * time.Millisecond)
 	defer tick.Stop()
 	go func() {
-		for {
-			select {
-			case <-tick.C:
-				app.EthBroadcaster.Trigger()
-				b.Commit()
-			}
+		for range tick.C {
+			app.EthBroadcaster.Trigger()
+			b.Commit()
 		}
 	}()
 	cltest.WaitForRuns(t, j, app.Store, 1)

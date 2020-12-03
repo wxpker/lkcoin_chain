@@ -34,6 +34,9 @@ func NewRunOutputCompleteWithResult(resultVal interface{}, resultCollection gjso
 			collectionCopy = append(collectionCopy, k.Value())
 		}
 		data, err = data.Add(ResultCollectionKey, collectionCopy)
+		if err != nil {
+			return NewRunOutputError(err)
+		}
 	}
 	return NewRunOutputComplete(data)
 }
