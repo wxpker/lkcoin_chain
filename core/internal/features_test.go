@@ -1139,6 +1139,8 @@ func setupMultiWordContracts(t *testing.T) (*bind.TransactOpts, common.Address, 
 }
 
 func TestIntegration_MultiwordV1_Sim(t *testing.T) {
+	// Simulate a consumer contract calling to obtain ETH quotes in 3 different currencies
+	// in a single callback.
 	config, cleanup := cltest.NewConfig(t)
 	defer cleanup()
 	user, _, _, consumerContract, operatorContract, b := setupMultiWordContracts(t)
