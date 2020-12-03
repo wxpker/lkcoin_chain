@@ -165,9 +165,7 @@ contract Operator is
     (bool success, ) = callbackAddress.call(abi.encodeWithSelector(callbackFunctionId, requestId, data)); // solhint-disable-line avoid-low-level-calls
     return success;
   }
-  event Test (
-  string msg
-  );
+    
   /**
    * @notice Called by the Chainlink node to fulfill requests with multi-word support
    * @dev Given params must hash back to the commitment stored from `oracleRequest`.
@@ -178,7 +176,7 @@ contract Operator is
    * @param callbackAddress The callback address to call for fulfillment
    * @param callbackFunctionId The callback function ID to use for fulfillment
    * @param expiration The expiration that the node should respond by before the requester can cancel
-   * @param data blah
+   * @param data The data to return to the consuming contract
    * @return Status if the external call was successful
    */
   function fulfillOracleRequest2(

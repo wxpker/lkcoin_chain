@@ -1148,6 +1148,7 @@ func TestIntegration_MultiwordV1_Sim(t *testing.T) {
 	user, _, _, consumerContract, operatorContract, b := setupMultiWordContracts(t)
 	app, cleanup := cltest.NewApplicationWithConfigAndKeyOnSimulatedBlockchain(t, config, b)
 	app.Config.Set("ETH_HEAD_TRACKER_MAX_BUFFER_SIZE", 100)
+	app.Config.Set("MIN_OUTGOING_CONFIRMATIONS", 1)
 
 	_, err := operatorContract.SetAuthorizedSender(user, app.Store.KeyStore.Accounts()[0].Address, true)
 	require.NoError(t, err)
@@ -1203,7 +1204,6 @@ func TestIntegration_MultiwordV1_Sim(t *testing.T) {
 	var empty [32]byte
 	assertPrices(t, empty[:], empty[:], empty[:], consumerContract)
 
-	app.EthBroadcaster.Trigger()
 	tick := time.NewTicker(100 * time.Millisecond)
 	defer tick.Stop()
 	go func() {
@@ -1216,8 +1216,6 @@ func TestIntegration_MultiwordV1_Sim(t *testing.T) {
 		}
 	}()
 	cltest.WaitForRuns(t, j, app.Store, 1)
-	app.EthBroadcaster.Trigger()
-
 	jr, err := app.Store.JobRunsFor(j.ID)
 	require.NoError(t, err)
 	cltest.WaitForEthTxAttemptCount(t, app.Store, 1)

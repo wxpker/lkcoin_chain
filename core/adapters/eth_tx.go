@@ -105,15 +105,6 @@ func (e *EthTx) insertEthTx(input models.RunInput, store *strpkg.Store) models.R
 		err                    error
 	)
 	if e.ABIEncoding != nil {
-		// Prepend the request ID part of the data prefix
-		//    bytes32 requestId,
-		//    uint256 payment,
-		//    address callbackAddress,
-		//    bytes4 callbackFunctionId,
-		//    uint256 expiration,
-		//    bytes calldata data
-		// e.DataPrefix = [requestID][payment][callbackAddress][callbackFnID][expiration]
-		// Need to include the request ID in the calldata as the first arg also
 		curr := input.Data().Get(models.ResultCollectionKey).Array()
 		updated := make([]interface{}, 0)
 		updated = append(updated, e.DataPrefix[:32])
@@ -299,21 +290,6 @@ func getTxDataUsingABIEncoding(e *EthTx, inputData models.JSON) ([]byte, error) 
 			return nil, errors.Wrapf(ErrInvalidABIEncoding, "can't convert %v to %v", jsonValues[i].Value(), argType)
 		}
 	}
-	//if e.DataPrefix != nil {
-	//	b, err := hexutil.Decode(e.DataPrefix.String())
-	//	if err != nil {
-	//		return nil, errors.Wrapf(err, "invalid data prefix")
-	//	}
-	//	var a [32]byte
-	//	copy(a[:], b[:])
-	//	prefix := []interface{}{a}
-	//	values = append(prefix, values...)
-	//	t, err := abi.NewType("bytes32", "", nil)
-	//	if err != nil {
-	//		return nil, errors.Errorf("err %v data prefix", err)
-	//	}
-	//	arguments = append([]abi.Argument{{Type: t}}, arguments...)
-	//}
 	packedArgs, err := arguments.PackValues(values)
 	if err != nil {
 		return nil, err

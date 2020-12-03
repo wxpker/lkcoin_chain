@@ -198,7 +198,6 @@ func (eb *ethBroadcaster) processUnstartedEthTxs(fromAddress gethCommon.Address)
 	for {
 		etx, err := eb.nextUnstartedTransactionWithNonce(fromAddress)
 		if err != nil {
-			fmt.Println("err", err.Error())
 			return errors.Wrap(err, "processUnstartedEthTxs failed")
 		}
 		if etx == nil {
@@ -207,7 +206,6 @@ func (eb *ethBroadcaster) processUnstartedEthTxs(fromAddress gethCommon.Address)
 		n++
 		a, err := newAttempt(eb.store, *etx, eb.config.EthGasPriceDefault())
 		if err != nil {
-			fmt.Println("err", err.Error())
 			return errors.Wrap(err, "processUnstartedEthTxs failed")
 		}
 
@@ -262,8 +260,8 @@ func (eb *ethBroadcaster) handleInProgressEthTx(etx models.EthTx, attempt models
 
 	ctx, cancel := context.WithTimeout(context.Background(), maxEthNodeRequestTime)
 	defer cancel()
-
 	sendError := sendTransaction(ctx, eb.ethClient, attempt)
+
 	if sendError.Fatal() {
 		etx.Error = sendError.StrPtr()
 		// Attempt is thrown away in this case; we don't need it since it never got accepted by a node
