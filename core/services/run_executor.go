@@ -65,6 +65,7 @@ func (re *runExecutor) Execute(runID *models.ID) error {
 		if taskRun.Status.Completed() {
 			continue
 		}
+
 		if !meetsMinRequiredIncomingConfirmations(&run, taskRun, run.ObservedHeight) {
 			logger.Debugw("Pausing run pending incoming confirmations",
 				run.ForLogger("required_height", taskRun.MinRequiredIncomingConfirmations)...,

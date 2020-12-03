@@ -1048,15 +1048,11 @@ func TestIntegration_MultiwordV1(t *testing.T) {
 		Run(func(args mock.Arguments) {
 			tx, ok := args.Get(1).(*types.Transaction)
 			require.True(t, ok)
-			// Should expect the function arguments to be
-			// {reqID,bid,ask}={bytes32,bytes32,bytes32}
 			bytes32, _ := abi.NewType("bytes32", "", nil)
 			var a abi.Arguments = []abi.Argument{{Type: bytes32}, {Type: bytes32}, {Type: bytes32}}
 			args, err := a.UnpackValues(tx.Data()[4:])
 			require.NoError(t, err)
-			assert.Equal(t, cltest.MustHexDecode32ByteString("0000000000000000000000000000000000000000000000000000000000000002"), args[0])
-			assert.Equal(t, cltest.MustHexDecode32ByteString("3130302e31000000000000000000000000000000000000000000000000000000"), args[1])
-			assert.Equal(t, cltest.MustHexDecode32ByteString("3130302e31350000000000000000000000000000000000000000000000000000"), args[2])
+			assert.Equal(t, cltest.MustHexDecode32ByteString("0000000000000000000000000000000000000000000000000000000000000001"), args[0])
 			gethClient.On("TransactionReceipt", mock.Anything, mock.Anything).
 				Return(&types.Receipt{TxHash: tx.Hash(), BlockNumber: big.NewInt(confirmed)}, nil)
 		}).
@@ -1076,7 +1072,7 @@ func TestIntegration_MultiwordV1(t *testing.T) {
 	priceResponse := `{"bid": 100.10, "ask": 100.15}`
 	mockServer, assertCalled := cltest.NewHTTPMockServer(t, http.StatusOK, "GET", priceResponse)
 	defer assertCalled()
-	spec := string(cltest.MustReadFile(t, "fixtures/web/multi_word_v1.json"))
+	spec := string(cltest.MustReadFile(t, "testdata/multiword_v1_web.json"))
 	spec = strings.Replace(spec, "https://bitstamp.net/api/ticker/", mockServer.URL, 2)
 	j := cltest.CreateSpecViaWeb(t, app, spec)
 	jr := cltest.CreateJobRunViaWeb(t, app, j)
@@ -1182,7 +1178,7 @@ func TestIntegration_MultiwordV1_Sim(t *testing.T) {
 		return ""
 	}
 	mockServer := cltest.NewHTTPMockServerWithAlterableResponse(t, response)
-	spec := string(cltest.MustReadFile(t, "testdata/multiword_v1.json"))
+	spec := string(cltest.MustReadFile(t, "testdata/multiword_v1_runlog.json"))
 	spec = strings.Replace(spec, "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=EUR", mockServer.URL, 1)
 	spec = strings.Replace(spec, "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD", mockServer.URL, 1)
 	spec = strings.Replace(spec, "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=JPY", mockServer.URL, 1)
