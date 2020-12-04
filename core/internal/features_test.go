@@ -25,8 +25,6 @@ import (
 	"github.com/smartcontractkit/chainlink/core/internal/gethwrappers/generated/operator"
 	"github.com/smartcontractkit/libocr/gethwrappers/linktoken"
 
-	"github.com/ethereum/go-ethereum/accounts/abi"
-
 	"github.com/smartcontractkit/chainlink/core/assets"
 	"github.com/smartcontractkit/chainlink/core/auth"
 	"github.com/smartcontractkit/chainlink/core/internal/cltest"
@@ -1048,11 +1046,14 @@ func TestIntegration_MultiwordV1(t *testing.T) {
 		Run(func(args mock.Arguments) {
 			tx, ok := args.Get(1).(*types.Transaction)
 			require.True(t, ok)
-			bytes32, _ := abi.NewType("bytes32", "", nil)
-			var a abi.Arguments = []abi.Argument{{Type: bytes32}, {Type: bytes32}, {Type: bytes32}}
-			args, err := a.UnpackValues(tx.Data()[4:])
-			require.NoError(t, err)
-			assert.Equal(t, cltest.MustHexDecode32ByteString("0000000000000000000000000000000000000000000000000000000000000001"), args[0])
+			assert.Equal(t, cltest.MustHexDecodeString(
+				"0000000000000000000000000000000000000000000000000000000000000001"+ // reqID
+					"00000000000000000000000000000000000000000000000000000000000000c0"+ // fixed offset
+					"0000000000000000000000000000000000000000000000000000000000000060"+ // length 3 * 32
+					"0000000000000000000000000000000000000000000000000000000000000001"+ // reqID
+					"3130302e31000000000000000000000000000000000000000000000000000000"+ // bid
+					"3130302e31350000000000000000000000000000000000000000000000000000"), // ask
+				tx.Data()[4:])
 			gethClient.On("TransactionReceipt", mock.Anything, mock.Anything).
 				Return(&types.Receipt{TxHash: tx.Hash(), BlockNumber: big.NewInt(confirmed)}, nil)
 		}).

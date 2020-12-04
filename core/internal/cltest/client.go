@@ -334,7 +334,6 @@ func (c *SimulatedBackendClient) PendingCodeAt(ctx context.Context, account comm
 
 func (c *SimulatedBackendClient) EstimateGas(ctx context.Context, call ethereum.CallMsg) (gas uint64, err error) {
 	return c.b.EstimateGas(ctx, call)
-	//panic("unimplemented")
 }
 
 func (c *SimulatedBackendClient) SuggestGasPrice(ctx context.Context) (*big.Int, error) {

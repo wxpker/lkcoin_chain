@@ -225,7 +225,7 @@ var (
 		"bytes32": reflect.TypeOf([32]byte{}),
 		"bytes4":  reflect.TypeOf([4]byte{}),
 		"bytes":   reflect.TypeOf([]byte{}),
-		"address": reflect.TypeOf([]byte{}),
+		"address": reflect.TypeOf(common.Address{}),
 	}
 	jsonTypes = map[gjson.Type]map[string]struct{}{
 		gjson.String: {
@@ -258,7 +258,6 @@ func init() {
 // if dynamic types (such as bytes) are used, the offset will be affected.
 func getTxDataUsingABIEncoding(encodingSpec []string, jsonValues []gjson.Result) ([]byte, error) {
 	var arguments abi.Arguments
-	//jsonValues := inputData.Get(models.ResultCollectionKey).Array()
 	if len(jsonValues) != len(encodingSpec) {
 		return nil, errors.Errorf("number of collectors %d != number of types in ABI encoding %d", len(jsonValues), len(encodingSpec))
 	}
