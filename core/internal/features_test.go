@@ -1093,7 +1093,7 @@ func TestIntegration_MultiwordV1(t *testing.T) {
 	assert.Equal(t, 2, len(jr2.TaskRuns[8].Result.Data.Get(models.ResultCollectionKey).Array()))
 }
 
-func assertPrices(t *testing.T, usd, eur, jpy []byte, consumer *multiwordconsumer.MultiwordConsumer) {
+func assertPrices(t *testing.T, usd, eur, jpy []byte, consumer *multiwordconsumer.MultiWordConsumer) {
 	var tmp [32]byte
 	copy(tmp[:], usd)
 	haveUsd, err := consumer.Usd(nil)
@@ -1109,7 +1109,7 @@ func assertPrices(t *testing.T, usd, eur, jpy []byte, consumer *multiwordconsume
 	assert.Equal(t, tmp[:], haveJpy[:])
 }
 
-func setupMultiWordContracts(t *testing.T) (*bind.TransactOpts, common.Address, *linktoken.LinkToken, *multiwordconsumer.MultiwordConsumer, *operator.Operator, *backends.SimulatedBackend) {
+func setupMultiWordContracts(t *testing.T) (*bind.TransactOpts, common.Address, *linktoken.LinkToken, *multiwordconsumer.MultiWordConsumer, *operator.Operator, *backends.SimulatedBackend) {
 	key, err := crypto.GenerateKey()
 	require.NoError(t, err, "failed to generate ethereum identity")
 	user := bind.NewKeyedTransactor(key)
@@ -1129,7 +1129,7 @@ func setupMultiWordContracts(t *testing.T) (*bind.TransactOpts, common.Address, 
 	b.Commit()
 
 	var empty [32]byte
-	consumerAddress, _, consumerContract, err := multiwordconsumer.DeployMultiwordConsumer(user, b, linkTokenAddress, operatorAddress, empty)
+	consumerAddress, _, consumerContract, err := multiwordconsumer.DeployMultiWordConsumer(user, b, linkTokenAddress, operatorAddress, empty)
 	require.NoError(t, err)
 	b.Commit()
 
