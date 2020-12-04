@@ -426,6 +426,7 @@ func (parseRunLog20190207withoutIndexes) parseJSON(log Log) (JSON, error) {
 		return JSON{}, err
 	}
 
+	// The operator contract restricts us to 256 versions, so
 	// 8 bytes worth of data versions is plenty.
 	b := bytes.NewBuffer(log.Data[expirationEnd+versionSize-8 : expirationEnd+versionSize])
 	var dataVersion uint64
