@@ -41,11 +41,10 @@ func TestStore_SyncDiskKeyStoreToDB_HappyPath(t *testing.T) {
 	defer cleanup()
 	require.NoError(t, app.Start())
 	store := app.GetStore()
+	pwd := cltest.Password
+	require.NoError(t, store.KeyStore.Unlock(pwd))
 
 	// create key on disk
-	pwd := "p@ssword"
-	err := store.KeyStore.Unlock(pwd)
-	require.NoError(t, err)
 	acc, err := store.KeyStore.NewAccount()
 	require.NoError(t, err)
 
